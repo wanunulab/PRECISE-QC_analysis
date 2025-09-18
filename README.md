@@ -14,7 +14,6 @@
 * **Porechop** v0.2.4
 * **Python** ≥3.9 with **pysamstats** installed (`pip install pysamstats`)
 * **IGV** (optional, for visual inspection)
-* POSIX shell tools: `awk`, `grep`, `sort`, `uniq`
 
 
 ### 0.2 Prepare project folders
@@ -64,25 +63,6 @@ samtools index $WORK/basecalled.bam
 # dorado --modified-bases ... --emit-moves > basecalled.bam
 ```
 
-### 1.2 Sanity checks
-
-```bash
-# Reads present?
-samtools view -c $WORK/basecalled.bam
-
-# Modified base tags present? (look for MM/ML tags)
-samtools view $WORK/basecalled.bam | head -n 5 | cut -f12- | grep -E "MM:Z|ML:B" || echo "No MM/ML tags on first 5 reads"
-
-# Move information present? (implementation-dependent; may appear as auxiliary tags)
-samtools view $WORK/basecalled.bam | head -n 5 | cut -f12- | grep -Ei "mv|move|moves" || echo "No explicit move tag found on first 5 reads"
-```
-
-### 1.3 (Optional) Export FASTQ
-
-```bash
-samtools fastq -@ 4 -o $WORK/basecalled.fastq $WORK/basecalled.bam
-```
-
 ---
 
 ## 2) Align reads to the sgRNA reference
@@ -128,12 +108,7 @@ samtools view -h $WORK/primary.bam \
 samtools index $WORK/unclipped.bam
 ```
 
-### 3.3 Sanity check: confirm no soft clipping remains
 
-```bash
-samtools view $WORK/unclipped.bam | awk '$6 ~ /S/ {c++} END{print c+0}'
-# Expect: 0
-```
 
 ---
 
@@ -166,11 +141,6 @@ pysamstats --type variation --fasta $REF/reference.fa $WORK/full_length.bam > $O
 porechop -i $WORK/basecalled.fastq -o $WORK/adapter_reads.fastq \
   --barcode_diff 1 --barcode_threshold 74 --verbosity 2
 ```
-
-> Notes:
->
-> * These thresholds were chosen for stringent 5′ adapter detection.
-> * Use `--check_reads <N>` to speed up trial runs.
 
 ### 5.2 Align adapter‑containing truncated reads
 
@@ -229,7 +199,7 @@ samtools view $WORK/trunc_alignment.bam | awk '{print length($10)}' \
 
 ---
 
-## (Optional) Alternative aligner
+## (Optional) Alternative aligner if the reads are longer than 300 bases
 
 For some ONT datasets, **minimap2** can be used instead of BWA‑MEM:
 
@@ -248,19 +218,7 @@ samtools index $WORK/alignment.mm2.bam
 
 Analysis by **Yvonne Yee** and **Dinara Boyko** (Northeastern University, Departments of Chemical Engineering & Physics).
 
-Read processing code adapted from **[PyPore](https://github.com/jmschrei/PyPore)** with modifications to support our file types.
 
----
-
-## Downloading Data
-
-To replicate the analysis, download the datasets from Figshare:
-
-* **Labeled data**
-* **Unlabeled data**
-* **Collection** with all files
-
-(Place your downloads under `$RAW/`.)
 
 ---
 
@@ -268,11 +226,6 @@ To replicate the analysis, download the datasets from Figshare:
 
 If you use this pipeline, please cite:
 
-> Yee Y., Boyko D., *PRECISE-QC: \[paper title]*, 2025. (Add full citation once available.)
+
 
 ---
-
-## One‑command example (bash script)
-
-Save as `run_precise_qc.sh` and customize paths.
-
