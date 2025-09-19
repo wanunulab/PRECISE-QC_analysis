@@ -93,7 +93,7 @@ samtools index $WORK/alignment.sorted.bam
 ### 3.1 Keep only primary alignments
 
 ```bash
-samtools view -@ 4 -b -F 0x900 $WORK/alignment.sorted.bam -o $WORK/primary.bam
+samtools view -@ 4 -b -F 0x100 $WORK/alignment.sorted.bam -o $WORK/primary.bam
 samtools index $WORK/primary.bam
 ```
 
@@ -101,7 +101,7 @@ samtools index $WORK/primary.bam
 
 ```bash
 samtools view -h $WORK/primary.bam \
-| awk 'substr($1,1,1)=="@" || $6 !~ /S/' \
+| awk '($0 ~ /^@/ || $6 !~ /S/)' \
 | samtools view -b -o $WORK/unclipped.bam
 samtools index $WORK/unclipped.bam
 ```
@@ -147,23 +147,8 @@ samtools view -bS $WORK/trunc_alignment.sam | samtools sort -o $WORK/trunc_align
 samtools index $WORK/trunc_alignment.bam
 ```
 
-### 5.3 Size‑based filtering and length distributions
 
-**From FASTQ:**
-
-```bash
-awk 'NR%4==2{print length($0)}' $WORK/adapter_reads.fastq \
-| sort -n | uniq -c | awk '{print $2"\t"$1}' > $OUT/truncated_read_lengths.tsv
-```
-
-**From BAM:**
-
-```bash
-samtools view $WORK/trunc_alignment.bam | awk '{print length($10)}' \
-| sort -n | uniq -c | awk '{print $2"\t"$1}' > $OUT/truncated_aligned_lengths.tsv
-```
-
-### 5.4 Inspect in IGV (optional)
+### 5.3 Inspect in IGV (optional)
 
 * Open `$REF/reference.fa` and `$WORK/trunc_alignment.bam` in **IGV**.
 * Examine coverage and CIGAR patterns near the 5′ end.
