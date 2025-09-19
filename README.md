@@ -15,7 +15,6 @@
 * **Python** ≥3.9 with **pysamstats** installed (`pip install pysamstats`)
 * **IGV** (optional, for visual inspection)
 
-
 ### 0.2 Prepare project folders
 
 ```bash
@@ -37,7 +36,7 @@ export OUT=$PROJECT/out
   * **Labeled data:** link in the paper’s Figshare page
   * **Unlabeled data:** link in the paper’s Figshare page
 
-> If you are reproducing exactly Yee et al. (2025), download from Figshare (see **Downloading Data** at the end) and place files under `$RAW/`.
+> If you are reproducing exactly Yee et al. (2025), download from https://www.ncbi.nlm.nih.gov/sra/PRJNA1305499 and place POD5 files under `$RAW/`.
 
 ---
 
@@ -107,7 +106,6 @@ samtools view -h $WORK/primary.bam \
 | samtools view -b -o $WORK/unclipped.bam
 samtools index $WORK/unclipped.bam
 ```
-
 
 
 ---
@@ -206,11 +204,10 @@ For some ONT datasets, **minimap2** can be used instead of BWA‑MEM:
 ```bash
 # install: conda install -c bioconda minimap2
 minimap2 -ax map-ont $REF/reference.fa $WORK/basecalled.fastq | \
-  samtools sort -o $WORK/alignment.mm2.bam
-samtools index $WORK/alignment.mm2.bam
+  samtools sort -o $WORK/alignment.bam
+samtools index $WORK/alignment.bam
 ```
 
-> The remainder of the filtering (primary, no soft clipping) and profiling steps are the same.
 
 ---
 
@@ -225,6 +222,7 @@ Analysis by **Yvonne Yee** and **Dinara Boyko** (Northeastern University, Depart
 ## How to cite
 
 If you use this pipeline, please cite:
+TODO: link to bioarx
 
 
 
