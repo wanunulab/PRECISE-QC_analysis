@@ -51,8 +51,7 @@ export OUT=$PROJECT/out
 dorado basecaller rna004_130bps_sup@v5.2.0 $RAW \
   --modified-bases pseU_2OmeU m5C_2OmeC 2OmeG inosine_m6A_2OmeA \
   --emit-moves \
-  | samtools sort -o $WORK/basecalled.bam
-samtools index $WORK/basecalled.bam
+
 ```
 
 **The list of modifications in the command is optional, adjust according to your sequence:**
