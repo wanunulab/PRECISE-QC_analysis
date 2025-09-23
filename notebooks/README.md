@@ -12,44 +12,52 @@ The notebooks are tailored for use on Google Colab for convenience, but they can
 
 ## Plots generated
 
-1. **Full-length RNA error analysis**  
+1. **Full-length RNA error analysis** 
+
+   *Error_nucleotide.ipynb*
+
    Base-by-base error profile of in-silico purified sgRNA **before vs after** optimization (“quality consultation”).
-Full-length RNA error analysis 
+   
+   Full-length RNA error analysis 
 ![Error profile comparison](./figures/fig_error_profile_comparison.png)
+
+____________________
+
 2. **Errors per full-length read**  
+
+   *Error_read.ipynb*
+
    Histogram of total errors (mismatch+insertion+deletion) per read.
 
-Errors per full-length read
+   Errors per full-length read
 ![Errors per read histogram](./figures/fig_errors_per_read.png)
 
-3. **Confusion matrices**  
+____________________
+
+3. **Confusion matrices** 
+
+   *Confusion__Matrix_Base_specific.ipynb*
+
    Heatmaps of **deletions** and **mismatches** by reference vs observed base
-Confusion matrices (deletions & mismatches)**  
+   
+   Confusion matrices (deletions & mismatches)**  
 ![Confusion matrices](./figures/fig_confusion_matrices.png)
 
+
+____________________
+
 4. **Error types by base**  
+
+   *Confusion__Matrix_Base_specific.ipynb*
+
    Bar plots of error rates (mismatch/insert/delete) stratified by reference base **A, U, C, G**.
-Error types by base**  
+
+   Error types by base 
 ![Error types by base](./figures/fig_error_types_by_base.png)
 
 ---
 
-## Notebooks map
 
-- `01_errors_per_read.ipynb` → Plot 1  
-- `02_error_profile_comparison.ipynb` → Plot 2  
-- `03_error_types_by_base.ipynb` → Plot 3  
-- `04_confusion_matrices.ipynb` → Plot 4  
-
-
-All notebooks save figures to `figures/` by default:
-
-- `fig_errors_per_read.png`
-- `fig_error_profile_comparison.png`
-- `fig_error_types_by_base.png`
-- `fig_confusion_matrices.png`
-
----
 
 ## Requirements
 
