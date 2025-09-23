@@ -1,4 +1,4 @@
-# PRECISE-QC: Step‑by‑Step Pipeline Manual
+**# PRECISE-QC: Step‑by‑Step Pipeline Manual
 
 *A reproducible guide to run the Yee et al. (2025) analysis from raw POD5 to error profiles.*
 
@@ -101,9 +101,17 @@ samtools index $WORK/primary.bam
 
 ```bash
 samtools view -h $WORK/primary.bam \
-| awk '($0 ~ /^@/ || $6 !~ /S/)' \
-| samtools view -b -o $WORK/unclipped.bam
+| awk 'BEGIN {OFS="\t"} /^@/ {print; next} {
+  split($6,C,/[0-9]*/); split($6,L,/[SMDIN]/);
+  if (C[2]=="S") {$10=substr($10,L[1]+1); if($11!~/^\*$/) $11=substr($11,L[1]+1)};
+  if (C[length(C)]=="S") {L1=length($10)-L[length(L)-1];
+    $10=substr($10,1,L1); if($11!~/^\*$/) $11=substr($11,1,L1)};
+  gsub(/[0-9]*S/,"",$6); print
+}' \
+| samtools view -b -o $WORK/unclipped.bam -
+
 samtools index $WORK/unclipped.bam
+
 ```
 
 
@@ -115,9 +123,13 @@ samtools index $WORK/unclipped.bam
 
 ```bash
 samtools view -h $WORK/unclipped.bam \
-| awk 'substr($1,1,1)=="@" || (length($10)>=95 && length($10)<=105)' \
-| samtools view -b -o $WORK/full_length.bam
+| awk 'BEGIN {OFS="\t"} /^@/ {print; next} {
+  if (length($10) >= 95 && length($10) <= 105) print
+}' \
+| samtools view -b -o $WORK/full_length.bam -
+
 samtools index $WORK/full_length.bam
+
 ```
 
 ### 4.2 Generate per‑nucleotide error profiles (pysamstats)
@@ -165,7 +177,7 @@ samtools index $WORK/trunc_alignment.bam
 * `$WORK/full_length.bam(.bai)` — 95–105 nt full‑length reads
 * `$WORK/adapter_reads.fastq` — reads containing the 5′ adapter (truncated set)
 * `$WORK/trunc_alignment.bam(.bai)` — alignments of adapter‑containing reads
-* `$OUT/error_profile.tsv` — per‑nucleotide error profile for full‑length reads
+* `$OUT/error_profile.txt` — per‑nucleotide error profile for full‑length reads
 * `$OUT/truncated_*lengths.tsv` — length distributions for truncated reads
 
 ---
@@ -175,25 +187,12 @@ samtools index $WORK/trunc_alignment.bam
 * **No MM/ML tags:** ensure Dorado was run with `--modified-bases` and the selected modifications.
 * **No moves:** ensure `--emit-moves` was included; some tags are model/CLI dependent.
 * **pysamstats fails:** make sure BAMs are **coordinate‑sorted** and **indexed**; use the same `reference.fa` you aligned to.
-* **Soft‑clipped reads remain:** re‑run step 3.2; your filter must run on **SAM text** (`samtools view -h ... | awk ... | samtools view -b`).
+* **Soft‑clipped reads remain:** re‑run step 3.2; your filter must run on **SAM text**.
 * **Few full‑length reads:** adjust the length window in step 4.1 (e.g., `90–110 nt`) and re‑profile.
 * **Adapter detection weak:** try relaxing/tightening `--barcode_threshold` in Porechop; verify the expected 5′ adapter sequence is included in Porechop’s database or provide a custom adapter file.
 
 ---
 
-## (Optional) Alternative aligner if the reads are longer than 300 bases
-
-For some ONT datasets, **minimap2** can be used instead of BWA‑MEM:
-
-```bash
-# install: conda install -c bioconda minimap2
-minimap2 -ax map-ont $REF/reference.fa $WORK/basecalled.fastq | \
-  samtools sort -o $WORK/alignment.bam
-samtools index $WORK/alignment.bam
-```
-
-
----
 
 ## Authors & Credits
 
@@ -206,8 +205,6 @@ Analysis by **Yvonne Yee** and **Dinara Boyko** (Northeastern University, Depart
 ## How to cite
 
 If you use this pipeline, please cite:
-TODO: link to bioarx
+https://www.biorxiv.org/content/10.1101/2025.09.20.677417v1
 
-
-
----
+---**
